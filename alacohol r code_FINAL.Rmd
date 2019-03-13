@@ -1,0 +1,379 @@
+---
+title: "EDA ASSIGNMENT"
+author: "NAGASHYAM,MOUSAM MAJUMDER,RHISHIKESH PADOLE,OENDRIC BAIDYA,RICHITA VERMA"
+date: "2 October 2018"
+output: html_document
+---
+
+
+```{r include=FALSE}
+library(dplyr)
+library(ggplot2)
+library(corrplot)
+std_alc = read.csv("C:/Users/Administrator/Downloads/python_assgn/student-alcohol-consumption/student-por.csv")
+sac=std_alc
+
+
+
+```
+
+
+### no.of male and female who consume alcohol
+
+```{r warning=FALSE}
+male_female_alc = std_alc %>%
+  group_by(sex) %>%
+  summarise(totalno = n())
+male_female_alc
+```
+```{r warning=FALSE}
+##graph
+ ggplot(data = male_female_alc,aes(x = sex, y = totalno))+
+geom_bar(stat = "identity",aes(fill=sex),width = 0.7)+
+theme_bw()+
+labs(x='Sex',y='total_no',subtitle='Gender base alcohol consumer',title='Bargraph')
+
+```
+
+### age wise alcohol consumption
+
+```{r warning=FALSE}
+male_female_alc = std_alc %>%
+  group_by(age,sex) %>%
+  summarise(total = n())
+male_female_alc
+```
+```{r warning=FALSE}
+p=ggplot(data=male_female_alc,aes(x=age,y=total))+geom_line(aes(col = sex))+geom_point()
+p1=p+theme_bw()
+p2=p1+labs(x='Ages',y='no_of_alcohol_consumer',title='Line-graph',subtitle='Age_based_alcohol_consumer')
+p2
+```
+
+
+## alcohol consumption on schooling basis
+
+## weekend alcohol consumption and day alcohol consumption
+
+```{r warning=FALSE}
+weekend = std_alc %>%
+  group_by(Walc) %>%
+  summarise(total = n()) 
+weekend
+day = std_alc %>%
+  group_by(Dalc) %>%
+  summarise(total = n())
+day
+
+```
+
+
+
+```{r warning=FALSE}
+ggplot(day,aes(x=Dalc,y=total))+geom_point(size=5,color=4)+geom_line(size=1,col=1)+theme_bw()+labs(title="day basis alcohol comparison",x='no of days',y='no.of student')
+ggplot(weekend,aes(x=Walc,y=total))+geom_point(size=5,color=2)+geom_line(size=1,col=1)+
+  labs(title='weekend basis alcohol comparison',x='no of weekend',y='no. of student')+theme_bw()
+```
+
+
+## students with romantic relationship consuming alcohol
+
+```{r warning=FALSE}
+relation_alcohol = std_alc %>%
+  group_by(romantic) %>%
+  summarise(total = n())
+relation_alcohol
+
+```
+```{r warning=FALSE}
+ggplot(data=relation_alcohol,aes(x=romantic,y=total))+geom_bar(stat = "identity",width=0.8,aes(fill= romantic))+theme_bw()+
+labs(title="relation based alcholoic comparison", x="romanitc", y="no_of_alcohol")
+```
+
+### health of students after consuming the alohol
+
+```{r warning=FALSE}
+health_issues = std_alc %>%
+  group_by(health) %>%
+  summarise(no_of_drink = n())
+health_issues
+```
+```{r warning=FALSE}
+ggplot(data=health_issues,aes(x=reorder(health,-no_of_drink),y=no_of_drink,fill=health))+
+  geom_bar(stat="identity",width=.5)+ theme_bw()+
+  labs(x="health",y="no_of_drink",title="health condition based on no of drinks")+
+  theme(axis.text.x=element_blank(), axis.title.x=element_blank(), axis.ticks.x = element_blank())
+```
+
+## no .of students who go with friends to drink alcohol
+
+```{r warning=FALSE}
+alc_frnds = std_alc %>%
+  group_by(goout,sex) %>%
+  summarise(total = n())
+alc_frnds
+```
+```{r warning=FALSE}
+ggplot(data=alc_frnds,aes(x=reorder(goout,-total),y=total,fill=sex))+geom_col()+theme_bw()+labs(title="no of students who with friends to drink alcohol",x="no.of.friends",y="student_no")
+```
+
+### students who drink alcohol after school in free time
+
+```{r warning=FALSE}
+after_school = std_alc %>%
+  group_by(freetime) %>%
+  summarise(total = n())
+after_school
+```
+```{r warning=FALSE}
+ggplot(after_school,aes(x=freetime,y=total))+geom_point(size=10,color=3)+geom_segment(aes(x=freetime, xend=freetime, y=0, yend=total),size=2)+theme_bw()+labs(title="freetime based students drinking comparison",x="free_time",y="no.of students")
+```
+
+# Pearson's Correlation
+```{r warning=FALSE}
+
+sac_num = sac %>% select(absences,G1,G2,G3)
+
+num_corr = cor(sac_num)
+
+num_corr
+
+num_corr_plot = corrplot(num_corr, method = "square", type = "upper")
+
+```
+
+# Spearman's Correlation 
+```{r warning=FALSE}
+
+sac_fact = sac %>% select(traveltime,studytime,failures,famrel,freetime,goout,Dalc,Walc,health)
+
+fact_corr = cor(sac_fact)
+
+fact_corr
+
+fact_corr_plot = corrplot(fact_corr, method = "square" ,type = "upper")
+
+```
+
+
+# Proportions 
+
+
+# between mother(housewife) and address(rural Vs urban) (p = urban , q = rural)
+```{r warning=FALSE}
+
+
+x1 = sac %>% filter(address == "U" & Mjob == "at_home") %>% summarise(total = n())  
+
+
+y1 = sac %>% filter(address == "R" & Mjob == "at_home") %>% summarise(total = n())
+
+
+z1 = sac %>% filter(Mjob == "at_home") %>% summarise(total = n())
+
+p1 = x1/z1
+
+p1
+
+q1 = y1/z1
+
+q1
+
+```
+# (Conclusion : the proportion of student who's mother are housewife with urban locality is slightly higher than with rural locality,
+#This means there is no relation between mother is housewife or not and locality is rural or urban)
+
+
+
+
+
+
+
+# between gaurdian is father and mother (p = father , q = mother)
+```{r warning=FALSE}
+
+x2 = sac %>% filter(guardian == "father") %>% summarise(total = n())  
+
+
+y2 = sac %>% filter(guardian == "mother") %>% summarise(total = n())
+
+
+z2 = sac %>% summarise(total = n())
+
+p2 = x2/z2
+
+p2
+
+q2 = y2/z2
+
+q2
+
+```
+#(Conclusion : There is significant difference between the gaurdian is father or mother,
+# This means being the guardian it may affects the student will consume alcohol
+# Here, it indicates that students who's guardian is mother more tends to consume alcohol)
+
+
+
+
+
+
+
+
+
+# between students takes alcohol wants to higher education or not (p = wants higher edu., q = doesn't want higher edu.)
+```{r warning=FALSE}
+
+x3 = sac %>% filter(higher == "yes") %>% summarise(total = n())  
+
+
+y3 = sac %>% filter(higher == "no") %>% summarise(total = n())
+
+
+z3 = sac %>%summarise(total = n())
+
+p3 = x3/z3
+
+p3
+
+q3 = y3/z3
+
+q3
+
+```
+# (Conclusion : The proportion of students wants to take higher education is more than those who doesn't want.)
+
+
+
+# between students which has internet access at home or not (p = internet access , q = no internet access)
+```{r warning=FALSE}
+
+x4 = sac %>% filter(internet == "yes") %>% summarise(total = n())  
+
+
+y4 = sac %>% filter(internet == "no") %>% summarise(total = n())
+
+
+z4 = sac %>% summarise(total = n())
+
+p4 = x4/z4
+
+p4
+
+q4 = y4/z4
+
+q4
+
+
+```
+
+# (Conclusion : The proportion of students which has internet access at home is greater than those who doesn't have internet access.)
+
+
+
+
+
+
+
+
+# between students which has attended nursery or not (p = attended nursery , q = not attended nursery)
+```{r warning=FALSE}
+
+x5 = sac %>% filter(nursery == "yes") %>% summarise(total = n())  
+
+
+y5 = sac %>% filter(nursery == "no") %>% summarise(total = n())
+
+
+z5 = sac %>% summarise(total = n())
+
+p5 = x5/z5
+
+p5
+
+q5 = y5/z5
+
+q5
+
+```
+# (Conclusion : The proportion of students attended nursery is greater than those who didn't attended.)
+
+
+
+
+
+
+
+
+# between students which has paid extra class/tutions fees or not (p = paid extra class/tutions fees,
+# q = not paid extra class/tutions fees)
+```{r warning=FALSE}
+
+x6 = sac %>% filter(paid == "yes") %>% summarise(total = n())  
+
+
+y6 = sac %>% filter(paid == "no") %>% summarise(total = n())
+
+
+z6 = sac %>% summarise(total = n())
+
+p6 = x6/z6
+
+p6
+
+q6 = y6/z6
+
+q6
+
+```
+# (Conclusion : The proportion of students which has paid extra class/tutions fees is less than those who paid.
+# Means, students without extra class more tends to consume alcohol)
+
+
+
+
+
+
+# between students which has attended nursery or not (p = attended nursery , q = not attended nursery)
+```{r warning=FALSE}
+
+x7 = sac %>% filter(famsup == "yes") %>% summarise(total = n())  
+
+
+y7 = sac %>% filter(famsup == "no") %>% summarise(total = n())
+
+
+z7 = sac %>% summarise(total = n())
+
+p7 = x7/z7
+
+p7
+
+q7 = y7/z7
+
+q7
+
+```
+# (Conclusion : The proportion of students who have family support for edu. is less than those who doesn't have.
+# Mean, Self-ignited students doesn't lean towards alcohol consumption)
+
+
+
+
+
+#Proportion Table
+```{r warning=FALSE}
+Proportion = c("Mother(Housewife) Vs Mother(no Housewife)", "Gaurdian(Father) Vs Gaurdian(Mother)",
+               "Wants higher edu. Vs not","Internet Access Vs not","Attended nursery Vs not",
+               "paid extra class fees Vs not","Educational support Vs not")
+Success = c(p1,p2,p3,p4,p5,p6,p7)
+Failure = c(q1,q2,q3,q4,q5,q6,q7)
+
+table = data.frame(cbind(Proportion,Success,Failure))
+
+
+View(table)
+
+```
+
+
