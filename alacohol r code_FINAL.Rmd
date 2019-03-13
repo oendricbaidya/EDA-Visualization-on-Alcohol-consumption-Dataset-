@@ -1,6 +1,6 @@
 ---
 title: "EDA ASSIGNMENT"
-author: "NAGASHYAM,MOUSAM MAJUMDER,RHISHIKESH PADOLE,OENDRIC BAIDYA,RICHITA VERMA"
+author: "OENDRIC BAIDYA"
 date: "2 October 2018"
 output: html_document
 ---
